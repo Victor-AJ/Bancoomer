@@ -1,0 +1,337 @@
+/* 
+TODO customize this sample style
+Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+body {
+    background-color:black;
+}
+
+.title_app{
+    position: absolute;
+    top: 150px;
+    right: 60px;
+    font-size:30px;
+    text-align: right;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-family: Georgia,'Times New Roman',times,serif;
+    font-style: italic;
+}
+
+.world {
+    position: relative;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+}
+
+input, textarea, select{
+    border-bottom: #cccccc solid 2px;
+    border-left: #666666 solid 2px;
+    border-right: #cccccc solid 2px;
+    border-top: #666666 solid 2px;
+    background-color: #FFFFFF;
+    color: #003366;
+}
+
+input.disabled, textarea.disabled, select.disabled {
+    background-color: #d8d8d8;
+}
+
+input.error, select.error{
+    border-bottom: #e77776 solid 2px;
+    border-left: #6f0000 solid 2px;
+    border-right: #e77776 solid 2px;
+    border-top: #6f0000 solid 2px;
+    background-color: #f8dbdb;
+    color: #003366;
+}
+
+input.focus, select.focus {
+    background-color: #002557;
+    color: #FFFFFF;
+}
+
+input.button {
+    text-align: center;
+    color: #002557;
+    font-size: 12px;
+    font-family: Arial,Helvetica,sans-serif;
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    background-image: url(../images/deg8.png);
+    background-repeat: repeat-x;
+    padding: 2px;
+    width: 80px;
+}
+
+input.buttonhover {
+    text-align: center;
+    color: #002557;
+    font-size: 12px;
+    font-family: Arial,Helvetica,sans-serif;
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    padding: 2px;
+    width: 80px;
+    cursor: pointer;
+    background-image: url(../images/deg9.png);
+    background-repeat: repeat-x;
+}
+
+div.start {
+    position: absolute;
+    top: 50%;
+    right: 50px;
+    font-family: Arial,Helvetica,sans-serif;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: bold;
+    width: 200px;
+}
+
+div.loading {
+    position: absolute;
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    padding: 1em;
+    background: url(../images/ajax-loader.gif) 5% 50% no-repeat;
+    font-family: verdana;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    color: #0883be;
+    background-color: #FFFFFF;
+    top: 17px;
+    right: 13px;
+    width: 130px;
+    height: auto;
+    vertical-align:middle;
+}
+
+div.appname {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFF;
+    position: absolute;
+    top: 25px;
+    right: 5px;
+    width: 110px;
+}
+
+.divcontent {
+    position: absolute;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    top: 80px;
+}
+
+div.divmenu{
+    position: absolute;
+    top: 55px;
+    left:10px;
+    right:10px;
+    width: 99.5%;
+    height:26px;
+    margin-bottom: 10px;
+    padding:0;
+}
+
+.internalcontent {
+    background-color: #f2f5f9;
+    border-bottom: #666666 solid 1px ;
+    border-left: #cccccc solid 1px;
+    border-right: #666666 solid 1px ;
+    border-top: #cccccc solid 1px ;
+    width: 100%;
+}
+
+.divConGrid{
+    overflow: auto;
+    width: 100%;
+    border: 2px solid;
+    border-color: silver #ffffff #ffffff silver ;
+    background: #f2f5f9;
+}
+
+#divLista a{
+    font-family:verdana;
+    font-size: 12px;
+    color: #00007b;
+    text-decoration: none;
+}
+
+#divLista a:hover{
+    color: #FF0000;	/* Red color when the user moves the mouse over sub menu items */
+}
+
+.titleblue1 {
+    background-image: url(../images/deg1.png);
+    background-repeat: repeat-x;
+    color: #ffffff;
+    text-align: center;
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: bold;
+    width:100%;
+}
+
+.titleblue2 {
+    background-image: url(../images/deg2.png);
+    background-repeat: repeat-x;
+    color: #ffffff;
+    text-align: center;
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+}
+
+.titleblue3 {
+    background-image: url(../images/deg3.png);
+    background-repeat: repeat-x;
+    color: #ffffff;
+    text-align: center;
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+}
+
+.imageborder{
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    position: relative;
+    top: 1px;
+    right: 1px;
+    left: 1px;
+}
+
+.imgheader {
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    position: absolute;
+    text-align: center;
+    background: url(../images/headerimage.jpg) no-repeat;
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: 100%;
+    height: 45px;
+}
+
+.font-white{    
+    font-family: Arial,Helvetica,sans-serif;
+    color: white;
+}
+
+.font-blue{    
+    font-family: Arial,Helvetica,sans-serif;
+    color: #0883be;
+}
+
+.list-tree{
+    border-bottom: #666666 solid 2px ;
+    border-left: #cccccc solid 2px;
+    border-right: #666666 solid 2px ;
+    border-top: #cccccc solid 2px ;
+    padding: 0.5em;
+    background-color: #f2f5f9;
+    font-weight: bold;
+    color: #808080;
+    text-align: left;
+    vertical-align: top;
+}
+
+.etiqueta{
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 11px;
+    background-color: #dde4ef;
+    color: #00007b;
+}
+
+.cellborder{
+    background-color: #f2f2f2;
+    border: #003366 solid 1px;
+    color: #003366;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 11px;
+}
+.cellbordertitle{
+    background-color: #cccccc;
+    border: #003366 solid 1px;
+    color: #003366;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 11px;
+    text-align: center;
+}
+
+.grid{
+    background-color:  silver;
+    font-family: arial;
+    font-size: 10px;
+    border: 0px;
+    padding : 2px;
+    color: teal;
+}
+
+.datoGrid1{
+    background: #fff;
+    color: #27343c;
+    font: normal 11px arial;
+    padding: 3px;
+    background-color: #ecebeb;
+}
+
+.datoGrid2{
+    color: #27343c;
+    font: normal 11px arial;
+    padding: 3px;
+    color: #002e7a;
+    background-color: #dce4f3;
+}
+
+.encCol{
+    font-family: arial;
+    font-size: 9pt;
+    text-align: center;
+    color: white;
+    background-image: url(../images/deg3.png);
+}
+
+.alerta{    
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 10pt;
+    color: #ff9900;
+    font-weight: bold;
+}
+
+div.errors {
+    padding-left: 2em;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    background: url(../images/alert.png) left no-repeat;
+    color: #ff0000;
+    font-family: verdana;
+    font-size: 10pt;
+    font-weight: bold;
+}

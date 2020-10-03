@@ -1,0 +1,406 @@
+<script type="text/javascript">
+
+	$("#divEspacios").html("");	
+    // Variables locales para el grid
+    var lastsel;
+    var adding = false;
+
+    function saveCatalog(url){
+        alert(url);
+        if(validEmptyFields()){
+            var func = function(data){
+                container.html(data).hide().fadeIn('slow');
+            }
+            //executeAjax("post", false, url, "json", func);
+            //loadPageJSON(controller, false,dispatch,container, false);
+        }else{
+            return false;
+        }
+    }
+
+    function validEmptyFields(){
+        var id = jQuery("#list1").getGridParam('selrow');
+        if (id) {
+            var ret = jQuery("#list1").getRowData(id);
+
+            alert("id="+ret.id+" invdate="+ret.indicador+" ");
+        }
+
+        //validUniqueField($('#txtname'), $('#errtxtname'), 'catalogProcessSophie.do', form, 'dispatch=validUniqueField&')
+        return true;
+    }
+
+     function edicion(editing){
+        if(editing){
+            $("#btnSave").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnUndo").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnNew").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnEdit").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnDelete").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnExport").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnPin").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnSearch").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnRefresh").addClass('ui-state-disabled').attr("disabled","disabled");
+        }else{
+            $("#btnSave").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnUndo").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnNew").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnEdit").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnDelete").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnExport").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnPin").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnSearch").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnRefresh").removeClass('ui-state-disabled').removeAttr("disabled");			
+        }  
+    }
+
+    function createButtons(){
+        var cadena = "<table class='ui-pg-table navtable' cellspacing='0' cellpadding='0' border='0' style='float: left; table-layout: auto;padding:2px;'><tbody><tr>";
+        cadena += addButton("btnNew","ui-icon-document","Agregar nueva fila","Agregar");
+        cadena += addButton("btnEdit","ui-icon-pencil","Modificar fila seleccionada","Modificar");
+        cadena += addButton("btnSave","ui-icon-disk","Guardar fila seleccionada","Guardar");
+        cadena += addButton("btnUndo","ui-icon-arrowreturnthick-1-w","Descartar los cambios","Deshacer");
+        cadena += addButton("btnDelete","ui-icon-trash","Eliminar fila seleccionada","Eliminar");
+        cadena += addButton("btnExport","ui-icon-suitcase","Exportar los datos de la tabla","Exportar");
+        cadena += "</tr></tbody></table>";
+        return cadena;
+    }
+
+    function addButton(idbtn,icon,title,name){
+        return "<td id='"+idbtn+"' class='ui-pg-button ui-corner-all border-button' title='"+title+"' style='cursor: pointer;'><div class='ui-pg-div'><span class='ui-icon "+icon+"'/>"+name+"</div></td>";
+    }
+
+    function addButtonEvents(){
+        $("#btnNew").click(function(){
+            if(!editing){
+                var datarow = {id:"0",anio:"",indicador:"Activo",fecha_mod:"",idusuario_mod:"",fecha_alta:"",idusuario_alta:""};
+                var su=jQuery("#list1").addRowData(0,datarow);
+                jQuery("#list1").setSelection(0,false);
+                jQuery("#list1").editRow(0,true);
+                lastsel = 0;
+                editing = true;
+                adding = true;
+                edicion(editing);
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Editar
+        $("#btnEdit").click(function(){
+            if(!editing){
+                var gr = jQuery("#list1").getGridParam('selrow');
+                if(gr != null){
+                    jQuery("#list1").editRow(gr,false);
+                    lastsel = gr;
+                    editing = true;
+                    adding = false;
+                    edicion(editing);
+                }else {
+                    var fAceptar = function(){
+                        $('#dialogMain').dialog("close");
+                    }
+                    jAlert(true,true,"Debe seleccionar una fila",fAceptar);
+                }
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Guardar
+        $("#btnSave").click(function(){
+            if(editing){
+				var id = jQuery("#list1").getGridParam('selrow');
+				if (id) {
+            		var ret = jQuery("#list1").getRowData(id);
+            		//alert("id="+ret.id);
+        		}				
+				
+				if (adding) var dispatch ="insert";
+				else var dispatch ="save";			
+				
+                var url = "process_direcciones.php?dispatch="+dispatch+"&id="+id+"&";
+                url += $("#catalogForm").serialize();	
+							
+				//alert (url);			
+                //if(saveCatalog(url)){
+				
+                jQuery("#list1").saveRow(lastsel,false,'clientArray');
+                editing = false;
+                adding = false;
+                edicion(editing);
+					
+				var func = function(data){					   			
+					var fAceptar = function(){
+							$('#dialogMain').dialog("close");
+					}
+					if(data.error == true){
+						
+						if(data.message != null){							
+							jAlert(true,true,data.message,fAceptar);
+						}else{
+							logout();
+						}
+					}else{
+						 //alert (data.message);	
+						 if(data.message != null){							
+							jAlert(true,false,data.message,fAceptar);
+							jQuery("#list1").trigger("reloadGrid");
+						}
+					}	
+				}	
+				
+				//alert (url);						
+				executeAjax("post", false ,url, "json", func);
+					
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Deshacer
+        $("#btnUndo").click(function(){
+            if(editing){
+                jQuery("#list1").restoreRow(lastsel);
+                editing = false;
+                adding = false;
+                edicion(editing);
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Borrar
+        $("#btnDelete").click(function(){
+            if(!editing){        
+				//alert("Click para Borrar");        
+                var gr = jQuery("#list1").getGridParam('selrow');
+                var fAceptar = function(){
+					
+                    var gr = jQuery("#list1").getGridParam('selrow');									
+					if (gr) {
+            			var ret = jQuery("#list1").getRowData(id);						     			
+        			}	
+					
+                    //jQuery("#list1").delRowData(gr);
+                    //$('#dialogMain').dialog("close");
+					
+					var func = function(data){					   			
+						var fAceptar = function(){
+							$('#dialogMain').dialog("close");
+						}
+						if(data.error == true){
+						
+							if(data.message != null){							
+								jAlert(true,true,data.message,fAceptar);
+							}else{
+								logout();
+							}
+						}else{
+						 //alert (data.message);	
+						 	if(data.message != null){							
+								jAlert(true,false,data.message,fAceptar);
+								jQuery("#list1").trigger("reloadGrid");
+							}
+						}	
+					}	
+															
+					var url = "process_direcciones.php?dispatch=delete&id="+gr;
+					//alert (url);
+					executeAjax("post", false ,url, "json", func);
+					
+                }
+                var fCancelar = function(){
+                    $('#dialogMain').dialog("close");
+                }
+                if( gr != null ){
+                    jConfirm(true,"\u00bfDesea eliminar el registro "+ gr +" seleccionado", fAceptar, fCancelar);
+                }else{
+                    jAlert(true,true,"Por favor.. Seleccione una fila",fCancelar)
+                };
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Exportar
+        $("#btnExport").click(function(){
+            if(!editing){
+                alert("Click en exportar");
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+    }
+
+</script>
+<br>
+<div class="ui-widget-header align-center">CATALOGO</div>
+<div>
+    <form id="catalogForm" method="" action="">
+        <div id="divGrid" style="padding:1%;width:98%" class="ui-widget ui-widget-content ui-corner-all">
+            <div id="errorGrid" style="display:none">
+                <div id="errorContent" class="ui-corner-all" style="padding: 0pt 0.7em;" ></div>
+            </div>
+            <table id="list1" class="scroll" cellpadding="0" cellspacing="0">
+                <tr><td style="border:1px black solid"></td></tr>
+            </table>
+            <div id="pager1" class="scroll" style="text-align:center;"></div>
+
+            <script type="text/javascript">
+                jQuery(document).ready(function(){
+                    var mygrid = jQuery("#list1").jqGrid({
+                        caption:"Catálogo de Opciones",
+                        mtype: "GET",                       
+						url:'process_direcciones.php?dispatch=load',
+						//alert ("Envio"+url);
+                        editurl:'process_direcciones.php?dispatch=delete&id',
+                        datatype: "json",
+                        colNames:['Edo.','Id','Dirección','Indicador','Fecha modifica', 'Usuario modifica','Fecha alta','Usuario alta'],
+                        colModel:[   
+                            {name: 'edo', index: 'edo', width: 20, align:"center", sortable: false },
+                            {name:'id',index:'id_direccion',width:20, align:"center", editable:false,
+                                editoptions:{readonly:true,size:10},
+                                searchoptions:{sopt:['eq','ne','lt','le','gt','ge']}
+                            },
+                            {name:'tx_nombre',index:'tx_nombre',width:300, align:"left", editable:true, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Perfil", rowpos:1 },
+								searchoptions:{sopt:['eq','ne','lt','le','gt','ge']}
+                            },   
+							{name:'tx_indicador',index:'tx_indicador',width:80, align:"center", editable:true,
+                                edittype:"select",
+                                editoptions:{value:"1:Activo;0:Inactivo", size:10},
+                                editrules:{required:true},
+                                formoptions:{label: "Indicador", rowpos:1 },
+                                searchoptions:{sopt:['eq']}
+                            },                                                                          
+                            {name:'fh_mod',index:'fh_mod',width:110, align:"center", editable:false,
+                                editoptions:{readonly:true,size:10},
+                                searchoptions:{dataInit:function(el){$(el).datepicker({dateFormat:'dd/mm/yy'});} }
+                            },
+                            {name:'id_usuariomod',index:'usuario_mod',width:150, align:"left", editable:false,
+                                editoptions:{readonly:true, size:60}
+                            },
+                            {name:'fh_alta',index:'fh_alta',width:110, align:"center", editable:false,
+                                editoptions:{readonly:true,size:60},
+                                searchoptions:{dataInit:function(el2){$(el2).datepicker({dateFormat:'dd/mm/yy'});} }
+                            },
+                            {name:'id_usuarioalta',index:'usuario_alta',width:150, editable: false,
+                                editoptions:{readonly:true,size:10}
+                            }
+                        ],
+                        pager: '#pager1', // Nombre del paginador
+                        altRows: true, // Activa la visualizacion de zebra en las filas
+                        imgpath: "/css/ui-personal/images",
+                        toolbar: [true,"bottom"], // Si cuenta con barra de herramienta y posicion de la misma
+                        rowNum:30,  // numero de filas por pagina
+                        rowList:[30,50,100],  // opciones de filas por pagina
+                        autowidth: true,    // Ancho automatico para columnas
+						//width:$("#gview_list1").width(),
+                        //height:360,
+						height:$("#CenterPane").height()-$("#NorthPane").height()-180,
+						shrinkToFit :false,
+            			sortable: true,
+                        gridview: true,     // Mejora rendimiento para mostrar datos. Algunas funciones no estan disponibles
+                        rownumbers: true,   // Muestra los numeros de linea en el grid
+                        viewrecords: true,  //
+                        viewsortcols: [true,'vertical',true], // Muestra las columnas que pueden ser ordenadas dinamicamente
+                        sortname: 'tx_nombre', // primer columna de ordenacion
+                        sortorder: 'asc',       // tipo de ordenacion inicial                        
+                        onSelectRow: function(id){
+                            if(!editing){
+                                lastsel = id;								
+                            }
+                        },
+                        loadComplete: function(){
+                            var ids = jQuery("#list1").getDataIDs();
+                            for(var i=0;i<ids.length;i++){
+                                indica = jQuery("#list1").getCell(ids[i],"tx_indicador");
+                                if(indica == '1'){
+                                    be = "<img style='cursor:pointer' border='none' src='images/greenball.png'>";
+									ind = "ACTIVO";
+                                }else{
+                                    be = "<img style='cursor:pointer' border='none' src='images/redball.png'>";
+									ind = "INACTIVO";
+                                }
+                                jQuery("#list1").setRowData(ids[i],{edo:be})
+								jQuery("#list1").setRowData(ids[i],{tx_indicador:ind})
+                            }
+                        },
+                        loadError : function(xhr,st,err) {
+                            var fAceptar = function(){
+                                $('#dialogMain').dialog("close");
+                            }
+                            jAlert(true,true,"Error cargando grid Type: "+st+"; Response: "+ xhr.status + " "+xhr.statusText,fAceptar);
+                        }
+                    }).navGrid('#pager1',
+                    {add:false,edit:false,view:false,del:false,search:false, refresh:false}, //options
+                    {height:200,width:400, reloadAfterSubmit:false, jqModal:false, closeOnEscape:true, bottominfo:"Campos marcados con (*) son requeridos"}, // edit options
+                    {height:200,width:400, reloadAfterSubmit:false, jqModal:false, closeOnEscape:true, bottominfo:"Campos marcados con (*) son requeridos"}, // add options
+                    {reloadAfterSubmit:false,jqModal:false, closeOnEscape:true}, // del options
+                    {closeOnEscape:true,multipleSearch:true}, // search options
+                    {height:150,jqModal:false,closeOnEscape:true} // view options
+                ).navButtonAdd('#pager1',{
+                        id:"btnRefresh",
+                        caption:"Actualizar",
+                        title:"Actualiza los datos mostrados en la tabla",
+                        buttonicon :'ui-icon-refresh',
+                        position:"first",
+                        onClickButton:function(){
+                            if(!editing){
+                                jQuery("#list1").trigger("reloadGrid");
+                            }
+                        }
+                    }).navButtonAdd('#pager1',{
+                        id:"btnSearch",
+                        caption:"Buscar",
+                        title:"Buscar informaci\u00f3n",
+                        buttonicon :'ui-icon-search',
+                        position:"first",
+                        onClickButton:function(){
+                            if(!editing){
+								//alert ("Envio"+url);
+                                jQuery("#list1").searchGrid({closeOnEscape:true,multipleSearch:true});
+                            }
+                        }
+                    }).navButtonAdd('#pager1',{
+                        id:"btnPin",
+                        caption:"Mostrar",
+                        title:"Mostrar/ocultar columnas",
+                        buttonicon :'ui-icon-pin-s',
+                        position:"first",
+                        onClickButton:function(){
+                            if(!editing){
+                                jQuery("#list1").setColumns();
+                            }
+                        }
+                    });
+
+                    $("#btnPin").addClass("border-button");     // Se agrega borde a los botones
+                    $("#btnSearch").addClass("border-button");
+                    $("#btnRefresh").addClass("border-button");
+                    $("#t_list1").addClass("ui-jqgrid-pager");  // Se agrega estilo para que puedan funcionar estilos por default del grid button
+                    $("#t_list1").height(26);                   // Se cambia alto toolbar
+                    $("#t_list1").append(createButtons());      // Se agregan los botones al toolbar
+                    addButtonEvents();
+                    edicion(false);
+                });
+                
+            </script>
+        </div>
+    </form>
+</div>

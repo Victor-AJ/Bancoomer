@@ -1,0 +1,22 @@
+@charset "utf-8";
+/* CSS Document */
+#divLoading {
+    position: absolute; 
+    border-bottom: #0883be solid 2px ;
+    border-left: #0883be solid 2px;
+    border-right: #0883be solid 2px ;
+    border-top: #0883be solid 2px ;
+    padding: 1em;
+    font-family: verdana;
+    font-size: 10px;
+    text-align: center;
+    color: #0883be;
+    background-color: #FFFFFF;
+    top: 110px;
+    right: 20px;
+    width: 300px;
+    height: auto;
+    z-index:1200;
+    vertical-align:middle;
+}
+

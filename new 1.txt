@@ -1,0 +1,96 @@
+ id_factura=2049 
+ id_proveedor=2 
+ id_cuenta=113 
+ id_mes=11 
+ id_factura_estatus=1 
+ id_moneda=2 
+ tx_anio=2018 
+ tx_factura=30241839B 
+ fh_factura=2018-11-05 
+ fh_inicio=2018-10-01 
+ fh_final=2018-12-31 fh_contable=0000-00-00 fl_precio_usd=658546.00 fl_precio_mxn=0.00 fl_precio_eur=0.00 fl_tipo_cambio=0.0000 tx_referencia= tx_ruta= tx_notas= tx_indicador=1 fh_alta=2018-11-23 01:27:00 id_usuarioalta=26 fh_mod=2018-11-23 01:29:00 id_usuariomod=26
+ 
+ 
+ id_proveedor=10 id_cuenta=56 id_mes=12 id_factura_estatus=1 id_moneda=1 tx_anio=2011 tx_factura=17156-A fh_factura=2011-11-09 fh_inicio=2011-12-01 fh_final=2011-12-31 fh_contable=-- fl_precio_usd= fl_precio_mxn=153265.76 fl_precio_eur= fl_tipo_cambio= tx_referencia= tx_ruta= tx_notas= tx_indicador=1 fh_alta=2011-11-22, 2:50 id_usuarioalta=28 fh_mod=2011-11-22, 2:50 id_usuariomod=28
+ 
+ 
+id_factura=2029 id_proveedor=2 id_cuenta=113 id_mes=11 id_factura_estatus=1 id_moneda=2 tx_anio=2018 tx_factura=5604644821 fh_factura=2018-11-05 fh_inicio=2018-11-01 fh_final=2019-01-31 fh_contable=-- fl_precio_usd=658546.00 fl_precio_mxn= fl_precio_eur= fl_tipo_cambio= tx_referencia= tx_ruta= tx_notas= tx_indicador=1 fh_alta=2018-11-7, 6:02 id_usuarioalta=26 fh_mod=2018-11-7, 6:02 id_usuariomod=26 
+id_factura=2029 id_proveedor=2 id_cuenta=113 id_mes=11 id_factura_estatus=1 id_moneda=2 tx_anio=2018 tx_factura=5604644821 fh_factura=2018-11-05 fh_inicio=2018-11-01 fh_final=2019-01-31 fh_contable=0000-00-00 fl_precio_usd=658546.00 fl_precio_mxn=0.00 fl_precio_eur=0.00 fl_tipo_cambio=0.0000 tx_referencia= tx_ruta= tx_notas= tx_indicador=1 fh_alta=2018-11-07 06:02:00 id_usuarioalta=26 fh_mod=2018-11-07 06:02:00 id_usuariomod=26
+id_factura=2029 id_proveedor=2 id_cuenta=113 id_mes=11 id_factura_estatus=4 id_moneda=2 tx_anio=2018 tx_factura=5604644821 fh_factura=2018-11-05 fh_inicio=2018-11-01 fh_final=2019-01-31 fh_contable=2018-11-20 fl_precio_usd=658546.00 fl_precio_mxn=13392915.86 fl_precio_eur=0.00 fl_tipo_cambio=20.3371 tx_referencia=3200112341 tx_ruta= tx_notas= tx_indicador=1 fh_alta=2018-11-07 06:02:00 id_usuarioalta=26 fh_mod=2018-11-21 12:55:00 id_usuariomod=36
+  
+ 
+ SELECT * 
+FROM  `tbl_factura_detalle` 
+WHERE id_factura
+IN ( 2023, 2024 ) 
+LIMIT 0 , 30
+
+update tbl_factura_detalle set fl_precio_mxn = (fl_precio_usd * 20.3371) where id_factura = 2920
+
+update tbl_factura_detalle set fl_precio_mxn = (fl_precio_usd * 20.3371) WHERE id_factura =2029
+AND tx_indicador =  '1'
+
+
+
+
+SELECT * FROM `tbl_factura_detalle` WHERE id_factura = 2104
+
+update tbl_factura_detalle set fl_precio_mxn = 6728.26776 where id_factura = 2104
+
+5604938502,
+5604939319 
+5604939443
+5604938879
+5604942168
+5604945898 
+5604938275
+5604939207 
+604939326
+5604938878
+MX-70018682
+
+
+
+select * from 
+
+
+
+
+
+update tbl_factura_detalle set fl_precio_mxn = (fl_precio_usd * 19.6426) WHERE id_factura = 2104
+AND tx_indicador =  '1'
+
+
+5604938502, 5604939319, 5604939443, 5604938879, 5604942168, 5604945898, 5604938275, 5604939207, 604939326, 5604938878, 'MX-70018682'
+
+id_factura, tx_factura, fl_precio_usd, fl_precio_mxn, fl_tipo_cambio
+
+
+id_factura tx_factura tx_factura fl_precio_usd fl_precio_mxn fl_tipo_cambio
+ok - 2104 - 5604938275 - 19867.00 	- 390239.53 	- 19.6426
+ok - 2107 - 5604938879 - 23400.00 	- 459636.84 	- 19.6426
+ok - 2108 - 5604939207 - 6948.75 	- 136491.52 	- 19.6426
+ok - 2109 - 5604939319 - 148347.00 	- 2913920.78 	- 19.6426
+ok - 2113 - 5604945898 - 42999.99 	- 844631.60 	- 19.6426
+ok - 2128 - 5604938502 - 672101.33 	- 13201817.58 	- 19.6426
+ok - 2106 - 5604938878 - 114.75 	- 2253.99 		- 19.6426
+ok - 2111 - 5604939443 - 55051.17 	- 1081348.11 	- 19.6426
+ok - 2112 - 5604942168 - 47150.00 	- 926148.59 	- 19.6426
+
+2105 - 5604938502 - 672101.33 	- 13201817.58	- 19.6426
+
+
+2118 - MX-70018682 - 0.00 		- 7060303.36 	- 0.0000
+
+
+update tbl_factura_detalle set fl_precio_mxn = (fl_precio_usd * 19.1222) WHERE id_factura = 2095
+AND tx_indicador =  '1'
+
+19.1222 2095
+
+update tbl_factura_detalle set fl_precio_mxn = (fl_precio_usd * 19.1222) WHERE id_factura = 2095
+
+
+
+
+

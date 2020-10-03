@@ -1,0 +1,541 @@
+<?
+header("Cache-Control: no-cache, must-revalidate"); 
+header("Pragma: no-cache"); 
+
+session_start();
+if 	(isset($_SESSION['sess_user']))
+{
+	$tx_p1	= $_GET['tx_p1']; 
+	$tx_p2	= $_GET['tx_p2']; 
+	$tx_p3	= $_GET['tx_p3'];
+	$tx_p4	= $_GET['tx_p4']; 
+	$tx_p5	= $_GET['tx_p5']; 
+?>
+<script type="text/javascript">
+
+	$("#divEspacios").html("");	
+    // Variables locales para el grid
+    var lastsel;
+    var adding = false;
+
+     function edicion(editing){
+	 
+	 	var p2= $('#tx_p2').val();
+	 	var p3= $('#tx_p3').val();
+	 	var p4= $('#tx_p4').val();
+		var p5= $('#tx_p5').val();
+		
+		//alert ("p5"+p5);
+		
+        if(editing){
+            $("#btnSave").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnUndo").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnNew").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnEdit").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnDelete").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnExport").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnPin").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#search_list1").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#refresh_list1").addClass('ui-state-disabled').attr("disabled","disabled");			
+   			$("#view_list1").addClass('ui-state-disabled').attr("disabled","disabled");
+        }else{
+            $("#btnSave").addClass('ui-state-disabled').attr("disabled","disabled");
+            $("#btnUndo").addClass('ui-state-disabled').attr("disabled","disabled");
+            if (p2==0) $("#btnNew").addClass('ui-state-disabled').attr("disabled","disabled");
+            else $("#btnNew").removeClass('ui-state-disabled').removeAttr("disabled");
+            if (p3==0) $("#btnEdit").addClass('ui-state-disabled').attr("disabled","disabled");
+			else $("#btnEdit").removeClass('ui-state-disabled').removeAttr("disabled");			
+            if (p4==0) $("#btnDelete").addClass('ui-state-disabled').attr("disabled","disabled");
+			else $("#btnDelete").removeClass('ui-state-disabled').removeAttr("disabled");                        
+            if (p5==0) $("#btnExport").addClass('ui-state-disabled').attr("disabled","disabled");
+			else $("#btnExport").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnPin").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnSearch").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#btnRefresh").removeClass('ui-state-disabled').removeAttr("disabled");
+			$("#search_list1").removeClass('ui-state-disabled').removeAttr("disabled");
+            $("#refresh_list1").removeClass('ui-state-disabled').removeAttr("disabled");
+			$("#view_list1").removeClass('ui-state-disabled').removeAttr("disabled");			
+        }  
+    }
+
+    function createButtons(){
+        var cadena = "<table class='ui-pg-table navtable' cellspacing='0' cellpadding='0' border='0' style='float: left; table-layout: auto;padding:2px;'><tbody><tr>";
+        cadena += addButton("btnNew","ui-icon-plus","Agregar nueva fila","Agregar");
+        cadena += addButton("btnEdit","ui-icon-pencil","Modificar fila seleccionada","Modificar");
+        cadena += addButton("btnSave","ui-icon-disk","Guardar fila seleccionada","Guardar");
+        cadena += addButton("btnUndo","ui-icon-arrowreturnthick-1-w","Descartar los cambios","Deshacer");
+        cadena += addButton("btnDelete","ui-icon-trash","Eliminar fila seleccionada","Eliminar");
+        cadena += addButton("btnExport","ui-icon-suitcase","Exportar los datos de la tabla","Exportar");
+        cadena += "</tr></tbody></table>";
+        return cadena;
+    }
+
+    function addButton(idbtn,icon,title,name){
+        return "<td id='"+idbtn+"' class='ui-pg-button ui-corner-all border-button' title='"+title+"' style='cursor: pointer;'><div class='ui-pg-div'><span class='ui-icon "+icon+"'/>"+name+"</div></td>";
+    }
+
+    function addButtonEvents(){
+	
+		$("#btnNew").click(function(){
+			var dispatch ="insert";
+        	if(!editing){					
+				jQuery("#list1").setGridState("hidden");
+				loadHtmlAjax(true, $("#divAlta"), "cat_proveedores_m.php?dispatch="+dispatch);
+        	}
+		});
+		
+		$("#btnEdit").click(function(){		
+			var dispatch ="save";				
+            if(!editing){
+                var gr = jQuery("#list1").getGridParam('selrow');
+                if(gr != null){
+                    jQuery("#list1").editRow(gr,false);
+                    lastsel = gr;
+					jQuery("#list1").setGridState("hidden");
+					loadHtmlAjax(true, $("#divAlta"), "cat_proveedores_m.php?dispatch="+dispatch+"&id="+gr);
+                }else {
+                    var fAceptar = function(){
+                        $('#dialogMain').dialog("close");
+                    }
+                    jAlert(true,true,"Debe seleccionar una fila",fAceptar);
+                }
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+		
+		function fieldsReq(){			
+		
+			var id = jQuery("#list1").getGridParam('selrow');
+			if (id==null) id="0";
+			
+			var va_pais='#'+id+'_tx_pais';	
+			var va_estado='#'+id+'_tx_estado';				
+			//alert($(va_usuario).val());	
+			
+			var error = true;
+			
+			validSelect($(va_pais), $("#divError")); 
+			validText(false, $(va_estado), $("#divError"), 1);
+			
+			if ( !validSelect($(va_pais), $("#divError")) || !validText(false, $(va_estado), $("#divError"), 1)) error=false;		
+									
+			return error;
+		}		
+		
+		$("#btnSave").click(function(){
+			
+			if(fieldsReq()){	
+			 	if(editing){
+					var id = jQuery("#list1").getGridParam('selrow');
+					if (id) {
+            			var ret = jQuery("#list1").getRowData(id);            		
+        			}				
+				
+					if (adding) var dispatch ="insert";
+					else var dispatch ="save";								
+                	
+				 	var url = "process_proveedores.php?dispatch="+dispatch+"&id="+id+"&";
+                	url += $("#catalogForm").serialize();	
+					//alert(url);
+				
+					jQuery("#list1").saveRow(lastsel,false,'clientArray');
+                	editing = false;
+                	adding = false;
+                	edicion(editing);
+					
+					var func = function(data){					   			
+						var fAceptar = function(){
+							$('#dialogMain').dialog("close");
+						}
+						if(data.error == true){						
+							if(data.message != null){							
+								jAlert(true,true,data.message,fAceptar);
+							}else{
+								logout();
+							}
+						} else {						
+						 	if(data.message != null){							
+								jAlert(true,false,data.message,fAceptar);
+								jQuery("#list1").trigger("reloadGrid");
+							}
+						}	
+					}	
+					//alert (url);						
+					executeAjax("post", false ,url, "json", func);					
+            	}
+			} else {
+           		var fAceptar = function(){
+                	$('#dialogMain').dialog("close");
+                }
+                jAlert(true,true,"Existen campos obligatorios vac&iacute;os",fAceptar);
+           }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        }); 
+
+        // Funcion click Deshacer
+        $("#btnUndo").click(function(){
+			$("#divError").hide();
+            if(editing){
+                jQuery("#list1").restoreRow(lastsel);
+                editing = false;
+                adding = false;
+                edicion(editing);
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Borrar
+        $("#btnDelete").click(function(){
+            if(!editing){        
+				//alert("Click para Borrar");        
+                var gr = jQuery("#list1").getGridParam('selrow');
+                var fAceptar = function(){
+					
+                    var gr = jQuery("#list1").getGridParam('selrow');									
+					if (gr) {
+            			var ret = jQuery("#list1").getRowData(gr);						     			
+        			}	
+					
+					var func = function(data){					   			
+						var fAceptar = function(){
+							$('#dialogMain').dialog("close");
+						}
+						if(data.error == true){
+						
+							if(data.message != null){							
+								jAlert(true,true,data.message,fAceptar);
+							}else{
+								logout();
+							}
+						}else{
+						 //alert (data.message);	
+						 	if(data.message != null){							
+								jAlert(true,false,data.message,fAceptar);
+								jQuery("#list1").trigger("reloadGrid");
+							}
+						}	
+					}	
+															
+					var url = "process_proveedores.php?dispatch=delete&id="+gr;
+					//alert (url);
+					executeAjax("post", false ,url, "json", func);
+					
+                }
+                var fCancelar = function(){
+                    $('#dialogMain').dialog("close");
+                }
+                if( gr != null ){
+                    jConfirm(true,"\u00bfDesea eliminar el registro "+ gr +" seleccionado", fAceptar, fCancelar);
+                }else{
+                    jAlert(true,true,"Por favor.. Seleccione una fila",fCancelar)
+                };
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+
+        // Funcion click Exportar
+        $("#btnExport").click(function(){
+            if(!editing){
+            	var url = "excel_proveedores.php";
+				window.open( url,"_blank");				
+            }
+        }).hover(function(){
+            $(this).addClass("ui-state-hover")
+        },function(){
+            $(this).removeClass("ui-state-hover")
+        });
+    }
+
+</script>
+<div class="ui-widget-header align-center">CATALOGOS</div>
+<div>
+    <form id="catalogForm" method="" action="">
+    	<input id="tx_p1" name="tx_p1" type="hidden" value="<? echo $tx_p1 ?>" />
+        <input id="tx_p2" name="tx_p2" type="hidden" value="<? echo $tx_p2 ?>" />
+        <input id="tx_p3" name="tx_p3" type="hidden" value="<? echo $tx_p3 ?>" />
+        <input id="tx_p4" name="tx_p4" type="hidden" value="<? echo $tx_p4 ?>" />
+        <input id="tx_p5" name="tx_p5" type="hidden" value="<? echo $tx_p5 ?>" />
+      	<div id="divError"></div> 
+        <div id="divGrid" style="padding:1%;width:98%" class="ui-widget ui-widget-content ui-corner-all">
+            <div id="errorGrid" style="display:none">
+                <div id="errorContent" class="ui-corner-all" style="padding: 0pt 0.7em;" ></div>
+            </div>
+            <table id="list1" class="scroll" cellpadding="0" cellspacing="0">
+                <tr><td style="border:1px black solid"></td></tr>
+            </table>
+            <div id="pager1" class="scroll" style="text-align:center;"></div>
+            <div id="divAlta"></div> 
+            <script type="text/javascript">
+				(function($){
+					jQuery("#list1").jqGrid({
+                        caption:"Cat&aacute;logo de Proveedores",
+                        mtype: "GET",                       
+						url:'process_proveedores.php?dispatch=load',
+                        datatype: "json",
+                        colNames:['Edo.','ID','Raz&oacute;n Social','Proveedor','RFC','Descripci&oacute;n del Servicio','N&uacute;mero de Contrato','Extranjero','IVA','N&uacute;mero GPS','Direcci&oacute;n','Pagina WEB','Fax','Contacto 1-Nombre ','Contacto 1-Puesto ','Contacto 1-Tel&eacute;fono','Contacto 1-Celular','Contacto 1-Correo','Contacto 2-Nombre','Contacto 2-Puesto','Contacto 2-Tel&eacute;fono','Contacto 2-Celular','Contacto 2-Correo','Indicador','Fecha modifica', 'Usuario modifica','Fecha alta','Usuario alta'],
+                        colModel:[   
+                            {name: 'edo', index: 'edo', width: 30, align:"center", sortable: false, formoptions:{label: "Estado", rowpos:1 } },
+                            {name:'id',index:'id_proveedor',width:30, align:"center", editable:false, editoptions:{readonly:true,size:10}, 
+								formoptions:{label: "Id", rowpos:2 }                               
+                            },
+                            {name:'tx_proveedor',index:'tx_proveedor',width:320, align:"left", editable:false, formoptions:{label: "Proveedor", rowpos:3 }
+							},  
+                            {name:'tx_proveedor_corto',index:'tx_proveedor_corto',width:250, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Nombre Corto", rowpos:4 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_rfc',index:'tx_rfc',width:100, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "RFC", rowpos:5 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_descripcion',index:'tx_descripcion',width:350, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Descripci&oacute;n del Servicio", rowpos:6 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_contrato',index:'tx_contrato',width:150, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "N&uacute;mero de Contrato", rowpos:7 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_extranjero',index:'tx_extranjero',width:100, align:"center", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Extranjero", rowpos:8 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_iva',index:'tx_iva',width:100, align:"center", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "IVA", rowpos:9 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_gps',index:'tx_gps',width:150, align:"center", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "N&uacute;mero GPS", rowpos:10 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_direccion',index:'tx_direccion',width:300, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Ubicaci&oacute;n", rowpos:11 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_pagina',index:'tx_pagina',width:200, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Pagina WEB", rowpos:12 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_fax',index:'tx_fax',width:100, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Fax", rowpos:13 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_contacto1',index:'tx_contacto1',width:180, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 1-Nombre", rowpos:14 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_puesto1',index:'tx_puesto1',width:200, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 1-Puesto", rowpos:15 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_telefono1',index:'tx_telefono1',width:120, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 1-Tel&eacute;fono", rowpos:16},
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_celular1',index:'tx_celular1',width:120, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 1-Celular", rowpos:17 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_correo1',index:'tx_correo1',width:200, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 1-Correo", rowpos:18 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_contacto2',index:'tx_contacto2',width:180, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 2-Nombre", rowpos:19 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_puesto2',index:'tx_puesto2',width:200, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 2-Puesto", rowpos:20 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_telefono2',index:'tx_telefono2',width:120, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 2-Tel&eacute;fono", rowpos:21 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_celular2',index:'tx_celular2',width:120, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 2-Celular", rowpos:22 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_correo2',index:'tx_correo2',width:200, align:"left", editable:false, 
+                                editoptions:{size:255,maxlength: 255},
+                                editrules:{required:true},
+                                formoptions:{label: "Contacto 2-Correo", rowpos:23 },
+								searchoptions:{sopt:['eq','ne','in','ni','bw','bn','ew','en','cn','nc']}
+                            },
+							{name:'tx_indicador',index:'tx_indicador',width:80, align:"center", editable:false,
+                                edittype:"select",
+                                editoptions:{value:"1:ACTIVO;0:INACTIVO", size:10},
+                                editrules:{required:true},
+                                formoptions:{label: "Indicador", rowpos:24 },
+                                searchoptions:{sopt:['eq']}
+                            },                                                                          
+                            {name:'fh_mod',index:'a.fh_mod',width:110, align:"center", editable:false,
+                                editoptions:{readonly:true,size:10},
+                                searchoptions:{dataInit:function(el){$(el).datepicker({dateFormat:'dd/mm/yy'});} }
+                            },
+                            {name:'id_usuariomod',index:'usuario_mod',width:150, align:"left", editable:false,
+                                editoptions:{readonly:true, size:60}
+                            },
+                            {name:'fh_alta',index:'fh_alta',width:110, align:"center", editable:false,
+                                editoptions:{readonly:true,size:60},
+                                searchoptions:{dataInit:function(el2){$(el2).datepicker({dateFormat:'dd/mm/yy'});} }
+                            },
+                            {name:'id_usuarioalta',index:'usuario_alta',width:150, editable: false,
+                                editoptions:{readonly:true,size:10}
+                            }
+                        ],
+                        pager: '#pager1', // Nombre del paginador
+                        altRows: true, // Activa la visualizacion de zebra en las filas
+                        imgpath: "/css/ui-personal/images",
+                        toolbar: [true,"bottom"], // Si cuenta con barra de herramienta y posicion de la misma
+                        rowNum:100,  // numero de filas por pagina
+                        rowList:[100,150,200],  // opciones de filas por pagina
+                        autowidth: true,    // Ancho automatico para columnas
+						//width:$("#gview_list1").width(),
+                        //height:360,
+						height:$("#CenterPane").height()-$("#NorthPane").height()-140,
+						shrinkToFit :false,
+            			sortable: true,
+                        gridview: true,     // Mejora rendimiento para mostrar datos. Algunas funciones no estan disponibles
+                        rownumbers: true,   // Muestra los numeros de linea en el grid
+                        viewrecords: true,  //
+                        viewsortcols: [true,'vertical',true], // Muestra las columnas que pueden ser ordenadas dinamicamente
+                        sortname: 'tx_proveedor',  // primer columna de ordenacion
+                        sortorder: 'asc',       // tipo de ordenacion inicial                        
+                        onSelectRow: function(id){
+                            if(!editing){
+                                lastsel = id;								
+                            }
+                        },
+                        loadComplete: function(){
+                            var ids = jQuery("#list1").getDataIDs();
+                            for(var i=0;i<ids.length;i++){
+                                indica = jQuery("#list1").getCell(ids[i],"tx_indicador");
+								indica_ext = jQuery("#list1").getCell(ids[i],"tx_extranjero");
+								indica_iva = jQuery("#list1").getCell(ids[i],"tx_iva");
+                                if(indica == '1'){
+                                    be = "<img style='cursor:pointer' border='none' src='images/greenball.png'>";
+									ind = "ACTIVO";
+                                }else{
+                                    be = "<img style='cursor:pointer' border='none' src='images/redball.png'>";
+									ind = "INACTIVO";
+                                }
+								
+								if(indica_ext == '1'){                                  
+									ind_ext = "SI";
+                                }else if(indica_ext == '0'){
+									ind_ext = "NO";
+                                }else{
+									ind_ext = "";
+								}
+								
+								if(indica_iva == '1'){                                  
+									ind_iva = "SI";
+                                }else if(indica_iva == '0'){
+									ind_iva = "NO";
+                                }else{
+									ind_iva = "";
+								}
+
+                                jQuery("#list1").setRowData(ids[i],{edo:be})
+								jQuery("#list1").setRowData(ids[i],{tx_indicador:ind})
+								jQuery("#list1").setRowData(ids[i],{tx_extranjero:ind_ext})
+								jQuery("#list1").setRowData(ids[i],{tx_iva:ind_iva})
+                            }
+                        },
+                        loadError : function(xhr,st,err) {
+                            var fAceptar = function(){
+                                $('#dialogMain').dialog("close");
+                            }
+                            jAlert(true,true,"Error cargando grid Type: "+st+"; Response: "+ xhr.status + " "+xhr.statusText,fAceptar);
+                        }
+                    }).navGrid('#pager1',                  
+					{add:false,edit:false,view:true,del:false,search:true, refresh:true}, //options
+                    {}, // edit options
+                    {}, // add options
+                    {reloadAfterSubmit:false,jqModal:false, closeOnEscape:true}, // del options
+                    {closeOnEscape:true,multipleSearch:true}, // search options                    
+					{height:500,width:800,jqModal:false,closeOnEscape:true} // view options
+                ).navButtonAdd('#pager1',{
+                        id:"btnPin",
+                        caption:"Mostrar",
+                        title:"Mostrar/ocultar columnas",
+                        buttonicon :'ui-icon-pin-s',
+                        position:"first",
+                        onClickButton:function(){
+                            if(!editing){
+                                jQuery("#list1").setColumns();
+                            }
+                        }
+                    });
+
+                    $("#btnPin").addClass("border-button");     // Se agrega borde a los botones
+                    $("#search_list1").addClass("border-button");
+					$("#view_list1").addClass("border-button");
+                    $("#refresh_list1").addClass("border-button");
+                    $("#t_list1").addClass("ui-jqgrid-pager");  // Se agrega estilo para que puedan funcionar estilos por default del grid button
+                    $("#t_list1").height(22);                   // Se cambia alto toolbar
+                    $("#t_list1").append(createButtons());      // Se agregan los botones al toolbar
+                    addButtonEvents();
+                    edicion(false);
+                })(jQuery); ;
+                
+            </script>
+        </div>
+    </form>
+</div>
+<?
+} else {
+	echo "Sessi&oacute;n Invalida";
+}	
+?>
